@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const $overlay = document.querySelector("#overlay");
 const $modal = document.querySelector("#modal");
 const $incomeBtn = document.querySelector("#incomeBtn");
@@ -6,6 +7,11 @@ const $expenseBtn = document.querySelector("#expenseBtn");
 const $closeBtn = document.querySelector("#closeBtn");
 const $transactionForm = document.querySelector("#transactionForm");
 const $alertError = document.querySelector("#alertError");
+const $AddIncome = document.querySelector("#Income");
+const $AddExpense = document.querySelector("#Expense");
+String.prototype.separateCurrency = function () {
+    return this.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
 const url = new URL(location.href);
 const ALL_TRANSACTIONS = JSON.parse(localStorage.getItem("transactions")) || [];
 const getCurrentQuery = () => {
@@ -69,6 +75,14 @@ const createNewTransaction = (e) => {
         showToast();
     }
 };
+const IncomeandExpense = () => {
+    const totalIncome = ALL_TRANSACTIONS.reduce((acc, nextIncome) => acc + nextIncome.transactionAmount, 0);
+    const totalExpense = ALL_TRANSACTIONS.reduce((acc, nextIncome) => acc + nextIncome.transactionAmount, 0);
+    $AddIncome.innerHTML = `${totalExpense.toString().separateCurrency()} USD`;
+    $AddExpense.innerHTML = `${(totalIncome - totalExpense).toString().separateCurrency()} USD`;
+};
+IncomeandExpense();
+$transactionForm.addEventListener("submit", createNewTransaction);
 $incomeBtn.addEventListener("click", () => {
     url.searchParams.set("modal", "income");
     window.history.pushState({ path: location.href + "?" + url.searchParams }, "", location.href + "?" + url.searchParams);
@@ -112,6 +126,5 @@ const renderTransactions = () => {
         $transactionsList.appendChild($transaction);
     });
 };
-// Sahna yuklanganda transaksiyalarni ko'rsatish
 renderTransactions();
 $transactionForm.addEventListener("submit", createNewTransaction);

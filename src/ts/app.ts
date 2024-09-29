@@ -5,9 +5,33 @@ const $expenseBtn = document.querySelector("#expenseBtn") as HTMLButtonElement;
 const $closeBtn = document.querySelector("#closeBtn") as HTMLButtonElement;
 const $transactionForm = document.querySelector("#transactionForm") as HTMLFormElement;
 const $alertError = document.querySelector("#alertError") as HTMLDivElement;
+const $AddIncome= document.querySelector("#Income") as HTMLElement;
+const $AddExpense = document.querySelector("#Expense") as HTMLElement;
+
+
+export{}
+declare global {
+    interface String {
+    separateCurrency(): string;
+    }
+}
+String.prototype.separateCurrency = function (): string {
+return this.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
+
+
+type Tincome = {
+    transactionName: string;
+    transactionType: string | undefined;
+    transactionAmount: number;
+    type: string;
+    date: number;
+}
 
 
 const url = new URL(location.href);
+
+
 
 const ALL_TRANSACTIONS = JSON.parse(localStorage.getItem("transactions") as string) || []
 
@@ -30,6 +54,7 @@ const checkModalOpen = () => {
         $overlay.classList.add("hidden")
     }
 }
+
 
 class Transaction {
     transactionName: string
@@ -83,6 +108,18 @@ const createNewTransaction = (e: Event) => {
     }
 }
 
+const IncomeandExpense = () => {
+    const totalIncome = ALL_TRANSACTIONS.reduce((acc: number, nextIncome: Tincome) => acc + nextIncome.transactionAmount, 0);
+    const totalExpense = ALL_TRANSACTIONS.reduce((acc: number, nextIncome: Tincome) => acc + nextIncome.transactionAmount, 0);  
+    $AddIncome.innerHTML = `${totalExpense.toString().separateCurrency()} USD`;
+    $AddExpense.innerHTML = `${(totalIncome - totalExpense).toString().separateCurrency()} USD`;
+
+}
+
+IncomeandExpense();
+
+$transactionForm.addEventListener("submit", createNewTransaction)
+
 $incomeBtn.addEventListener("click", () => {
     url.searchParams.set("modal", "income")
     window.history.pushState({ path: location.href + "?" + url.searchParams }, "", location.href + "?" + url.searchParams);
@@ -108,6 +145,7 @@ localStorage.setItem("transactions", JSON.stringify(ALL_TRANSACTIONS))
 const getAllTransactions = (): Transaction[] => {
     return JSON.parse(localStorage.getItem('transactions') || '[]');
 }
+
 
 
 
@@ -137,8 +175,9 @@ const renderTransactions = () => {
     });
 }
 
-// Sahna yuklanganda transaksiyalarni ko'rsatish
 renderTransactions();
+
+
 
 
 
